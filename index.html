@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget, Terrain & Urgences - Synchronisation Automatique</title>
+  <title>Budget & Epargne</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -74,9 +74,9 @@
         </div>
         <div>
           <h1 class="text-base font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-400 dark:to-emerald-200 bg-clip-text text-transparent">
-            Mon Budget, Terrain & Urgences
+            Mon Budget & Epargne
           </h1>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400">Objectif 2 Ans • 300 000 FCFA Net</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400"> Suivi d'Épargne</p>
         </div>
       </div>
       
@@ -88,8 +88,8 @@
         <button onclick="switchTab('terrain')" id="dtTab-terrain" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
           <i data-lucide="target" class="w-4 h-4"></i> Projet Terrain
         </button>
-        <button onclick="switchTab('woyofal')" id="dtTab-woyofal" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
-          <i data-lucide="zap" class="w-4 h-4"></i> Woyofal & Eau
+        <button onclick="switchTab('seneau')" id="dtTab-seneau" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+          <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i> SEN'EAU
         </button>
         <button onclick="switchTab('epargne')" id="dtTab-epargne" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
           <i data-lucide="trending-up" class="w-4 h-4"></i> Épargne & Urgences
@@ -126,16 +126,23 @@
       
       <!-- Cartes synthétiques -->
       <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
+        
+        <!-- SALAIRE NET MODIFIABLE -->
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Salaire Net</span>
-          <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white">300 000 FCFA</div>
-          <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Loyer = 0 FCFA</p>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Salaire Net</span>
+            <button onclick="editSalaireNet()" class="text-brand-600 hover:text-brand-700 p-0.5 no-print" title="Modifier le salaire">
+              <i data-lucide="pencil" class="w-3 h-3"></i>
+            </button>
+          </div>
+          <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white" id="displaySalaireNet">300 000 FCFA</div>
+          <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium"> </p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
           <div class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400">165 000 FCFA</div>
-          <p class="text-[10px] text-slate-400 mt-1">Scolarité, Épouse, Eau</p>
+          <p class="text-[10px] text-slate-400 mt-1">Scolarité, Épouse, SEN'EAU</p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
@@ -168,7 +175,7 @@
           </div>
           <div class="space-y-1.5 text-xs pt-3 border-t border-slate-100 dark:border-slate-700">
             <div class="flex justify-between"><span class="text-slate-500">Charges Fixes (55%)</span><span class="font-bold">165 000 FCFA</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Marché / Électricité (23.3%)</span><span class="font-bold">70 000 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Marché & SEN'EAU (23.3%)</span><span class="font-bold">70 000 FCFA</span></div>
             <div class="flex justify-between"><span class="text-slate-500">Épargne Terrain (21.7%)</span><span class="font-bold text-emerald-600">65 000 FCFA</span></div>
           </div>
         </div>
@@ -179,8 +186,8 @@
           </h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
-              <div class="font-bold mb-1 flex items-center gap-1.5 text-blue-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i> Facture d'Eau (30k)</div>
-              <p class="text-slate-500">Traquez les fuites pour ramener l'eau à 15k. Redirigez l'économie de 15 000 FCFA directement vers l'épargne terrain.</p>
+              <div class="font-bold mb-1 flex items-center gap-1.5 text-blue-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i> Facture SEN'EAU (30k)</div>
+              <p class="text-slate-500">Traquez les fuites pour ramener la SEN'EAU à 15k. Redirigez l'économie de 15 000 FCFA directement vers l'épargne terrain.</p>
             </div>
             <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
               <div class="font-bold mb-1 flex items-center gap-1.5 text-amber-500"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Matelas de Sécurité</div>
@@ -191,8 +198,8 @@
             <button onclick="switchTab('terrain')" class="flex-1 py-2 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold text-xs rounded-xl hover:bg-brand-100 transition flex items-center justify-center gap-2">
               Projet Terrain <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
-            <button onclick="switchTab('woyofal')" class="flex-1 py-2 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl hover:bg-amber-100 transition flex items-center justify-center gap-2">
-              Suivi Woyofal <i data-lucide="zap" class="w-4 h-4"></i>
+            <button onclick="switchTab('seneau')" class="flex-1 py-2 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold text-xs rounded-xl hover:bg-blue-100 transition flex items-center justify-center gap-2">
+              Suivi SEN'EAU <i data-lucide="droplet" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
@@ -255,7 +262,7 @@
         </div>
       </div>
 
-      <!-- SIMULATEUR DE PRIMES & RENTREES EXCEPTIONNELLES -->
+      <!-- SIMULATEUR DE PRIMES -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <form id="formPrime" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
           <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
@@ -297,7 +304,7 @@
         </div>
       </div>
 
-      <!-- CHECK-LIST ADMINISTRATIVE DU TERRAIN -->
+      <!-- CHECK-LIST ADMINISTRATIVE -->
       <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
         <div class="flex justify-between items-center">
           <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
@@ -313,18 +320,18 @@
 
     </div>
 
-    <!-- ================= BLOC 3 : WOYOFAL & SUIVI DE L'EAU ================= -->
-    <div id="section-woyofal" class="tab-content hidden space-y-6">
+    <!-- ================= BLOC 3 : SUIVI EXCLUSIF SEN'EAU ================= -->
+    <div id="section-seneau" class="tab-content hidden space-y-6">
       
-      <!-- Objectif Eau -->
+      <!-- Objectif Réduction Eau -->
       <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-2xl">
             <i data-lucide="droplet" class="w-6 h-6"></i>
           </div>
           <div>
-            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Objectif Réduction Eau</h3>
-            <p class="text-xs text-slate-500">Ramener la facture d'eau de 30 000 FCFA à 15 000 FCFA / mois.</p>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Registre Factures SEN'EAU</h3>
+            <p class="text-xs text-slate-500">Objectif : Ramener la facture de 30 000 FCFA à 15 000 FCFA / mois.</p>
           </div>
         </div>
         <div class="text-right">
@@ -333,46 +340,46 @@
         </div>
       </div>
 
-      <!-- Formulaire Recharges Woyofal -->
+      <!-- Formulaire Facture SEN'EAU -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <form id="formWoyofal" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+        <form id="formSeneau" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
           <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Recharge Woyofal Électricité
+            <i data-lucide="plus-circle" class="w-4 h-4 text-blue-500"></i> Nouvelle Facture SEN'EAU
           </h3>
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Date d'Achat</label>
-            <input type="date" id="woyofalDate" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Mois / Période</label>
+            <input type="month" id="seneauMois" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Montant Recharge (FCFA)</label>
-            <input type="number" id="woyofalMontant" value="5000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Montant Facture (FCFA)</label>
+            <input type="number" id="seneauMontant" value="15000" min="1000" step="500" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Code / Remarque (Optionnel)</label>
-            <input type="text" id="woyofalCode" placeholder="ex: Code recharge 20 chiffres..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Réf / N° Facture (Optionnel)</label>
+            <input type="text" id="seneauRef" placeholder="ex: Facture N° 45892..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
           </div>
-          <button type="submit" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm transition">
-            Consigner la recharge
+          <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+            Enregistrer la facture SEN'EAU
           </button>
         </form>
 
         <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
           <div class="flex justify-between items-center">
-            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Historique Woyofal du Mois</h3>
-            <span class="text-xs font-bold text-amber-600 dark:text-amber-400" id="totalWoyofalMois">Total : 0 FCFA</span>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Historique des Factures SEN'EAU</h3>
+            <span class="text-xs font-bold text-blue-600 dark:text-blue-400" id="totalSeneauAnnee">Total : 0 FCFA</span>
           </div>
 
           <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 dark:bg-slate-700/60 text-slate-500 uppercase font-semibold">
                 <tr>
-                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Période</th>
                   <th class="p-2.5">Montant</th>
-                  <th class="p-2.5">Code / Note</th>
+                  <th class="p-2.5">Référence / Note</th>
                   <th class="p-2.5 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody id="tableWoyofalBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+              <tbody id="tableSeneauBody" class="divide-y divide-slate-100 dark:divide-slate-700">
                 <!-- Injected via JS -->
               </tbody>
             </table>
@@ -448,7 +455,7 @@
           <h3 class="font-bold text-sm text-slate-900 dark:text-white">Ajouter une dépense</h3>
           <div>
             <label class="block text-xs font-medium text-slate-500 mb-1">Motif</label>
-            <input type="text" id="depenseMotif" placeholder="ex: Scolarité, Épouse, Eau..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            <input type="text" id="depenseMotif" placeholder="ex: Scolarité, Épouse, SEN'EAU..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -459,7 +466,7 @@
               <label class="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
               <select id="depenseCategorie" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
                 <option value="Charges Fixes">Charges Fixes</option>
-                <option value="Eau / Électricité">Eau / Électricité</option>
+                <option value="SEN'EAU">SEN'EAU</option>
                 <option value="Marché / Nourriture">Marché / Nourriture</option>
                 <option value="Divers">Divers</option>
               </select>
@@ -508,9 +515,9 @@
       <i data-lucide="target" class="w-5 h-5"></i>
       <span class="text-[9px] font-semibold mt-0.5">Terrain</span>
     </button>
-    <button onclick="switchTab('woyofal')" id="mbTab-woyofal" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
-      <i data-lucide="zap" class="w-5 h-5"></i>
-      <span class="text-[9px] font-semibold mt-0.5">Woyofal</span>
+    <button onclick="switchTab('seneau')" id="mbTab-seneau" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
+      <i data-lucide="droplet" class="w-5 h-5"></i>
+      <span class="text-[9px] font-semibold mt-0.5">SEN'EAU</span>
     </button>
     <button onclick="switchTab('epargne')" id="mbTab-epargne" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="trending-up" class="w-5 h-5"></i>
@@ -546,10 +553,11 @@
     }
 
     let activeTab = 'dashboard';
+    let salaireNet = 300000;
     let targetPrixTerrain = 2000000;
     let epargnesList = [];
     let depensesList = [];
-    let woyofalList = [];
+    let seneauList = [];
     let primesList = [];
     let checklistState = [false, false, false, false, false];
     let chartInstance = null;
@@ -575,14 +583,16 @@
       db.ref('budget_data').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
+          salaireNet = data.salaireNet || 300000;
           epargnesList = data.epargnes || [];
           depensesList = data.depenses || [];
-          woyofalList = data.woyofal || [];
+          seneauList = data.seneau || [];
           primesList = data.primes || [];
           checklistState = data.checklist || [false, false, false, false, false];
           targetPrixTerrain = data.targetTerrain || 2000000;
           document.getElementById('selectPrixTerrain').value = targetPrixTerrain;
         } else {
+          salaireNet = 300000;
           epargnesList = [
             { id: 1, mois: '2026-08', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
             { id: 2, mois: '2026-09', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
@@ -591,7 +601,7 @@
           depensesList = [
             { id: 1, date: '2026-10-02', motif: 'Scolarité Enfants', montant: 65000, categorie: 'Charges Fixes' },
             { id: 2, date: '2026-10-03', motif: 'Budget Épouse', montant: 70000, categorie: 'Charges Fixes' },
-            { id: 3, date: '2026-10-05', motif: 'Facture d\'Eau', montant: 30000, categorie: 'Eau / Électricité' }
+            { id: 3, date: '2026-10-05', motif: 'Facture SEN\'EAU', montant: 30000, categorie: 'SEN\'EAU' }
           ];
           saveData();
         }
@@ -609,9 +619,10 @@
     function saveData() {
       if (db) {
         db.ref('budget_data').set({
+          salaireNet: salaireNet,
           epargnes: epargnesList,
           depenses: depensesList,
-          woyofal: woyofalList,
+          seneau: seneauList,
           primes: primesList,
           checklist: checklistState,
           targetTerrain: targetPrixTerrain
@@ -620,12 +631,20 @@
       renderAll();
     }
 
+    function editSalaireNet() {
+      const nouveauSalaire = prompt("Saisissez le montant de votre Salaire Net (FCFA) :", salaireNet);
+      if (nouveauSalaire !== null && !isNaN(nouveauSalaire) && parseInt(nouveauSalaire) > 0) {
+        salaireNet = parseInt(nouveauSalaire);
+        saveData();
+      }
+    }
+
     function switchTab(tabId) {
       activeTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`section-${tabId}`).classList.remove('hidden');
 
-      ['dashboard', 'terrain', 'woyofal', 'epargne', 'depenses'].forEach(t => {
+      ['dashboard', 'terrain', 'seneau', 'epargne', 'depenses'].forEach(t => {
         const dtBtn = document.getElementById(`dtTab-${t}`);
         const mbBtn = document.getElementById(`mbTab-${t}`);
         
@@ -653,9 +672,8 @@
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
       document.getElementById('epargneMois').value = `${yyyy}-${mm}`;
-      document.getElementById('woyofalDate').value = `${yyyy}-${mm}-${dd}`;
+      document.getElementById('seneauMois').value = `${yyyy}-${mm}`;
     }
 
     function updateTerrainTarget() {
@@ -692,16 +710,16 @@
       saveData();
     });
 
-    document.getElementById('formWoyofal').addEventListener('submit', (e) => {
+    document.getElementById('formSeneau').addEventListener('submit', (e) => {
       e.preventDefault();
-      const date = document.getElementById('woyofalDate').value;
-      const montant = parseInt(document.getElementById('woyofalMontant').value);
-      const code = document.getElementById('woyofalCode').value || '-';
+      const mois = document.getElementById('seneauMois').value;
+      const montant = parseInt(document.getElementById('seneauMontant').value);
+      const ref = document.getElementById('seneauRef').value || '-';
 
-      if (!date || isNaN(montant)) return;
+      if (!mois || isNaN(montant)) return;
 
-      woyofalList.unshift({ id: Date.now(), date, montant, code });
-      document.getElementById('woyofalCode').value = '';
+      seneauList.unshift({ id: Date.now(), mois, montant, ref });
+      document.getElementById('seneauRef').value = '';
       saveData();
     });
 
@@ -726,14 +744,15 @@
 
     window.deleteEpargne = function(id) { epargnesList = epargnesList.filter(item => item.id !== id); saveData(); };
     window.deleteDepense = function(id) { depensesList = depensesList.filter(item => item.id !== id); saveData(); };
-    window.deleteWoyofal = function(id) { woyofalList = woyofalList.filter(item => item.id !== id); saveData(); };
+    window.deleteSeneau = function(id) { seneauList = seneauList.filter(item => item.id !== id); saveData(); };
     window.deletePrime = function(id) { primesList = primesList.filter(item => item.id !== id); saveData(); };
 
     function renderAll() {
+      document.getElementById('displaySalaireNet').textContent = formatFCFA(salaireNet);
       renderTerrainProgress();
       renderEpargneTable();
       renderDepensesTable();
-      renderWoyofalTable();
+      renderSeneauTable();
       renderPrimesTable();
       renderChecklist();
       renderChart();
@@ -754,7 +773,6 @@
       const rythmeRequis = Math.round(targetPrixTerrain / 24);
       const fraisAnnexes = Math.round(targetPrixTerrain * 0.10);
 
-      // Calcul Fonds d'urgence
       const totalUrgences = epargnesList
         .filter(item => item.destination === "Fonds d'Urgence / Sécurité")
         .reduce((sum, item) => sum + item.montant, 0);
@@ -832,22 +850,26 @@
       lucide.createIcons();
     }
 
-    function renderWoyofalTable() {
-      const tbody = document.getElementById('tableWoyofalBody');
+    function renderSeneauTable() {
+      const tbody = document.getElementById('tableSeneauBody');
       tbody.innerHTML = '';
-      let totalW = 0;
+      let totalSeneau = 0;
 
-      woyofalList.forEach(item => {
-        totalW += item.montant;
+      seneauList.forEach(item => {
+        totalSeneau += item.montant;
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
 
+        const [year, month] = item.mois.split('-');
+        const dateObj = new Date(year, month - 1);
+        const moisNom = dateObj.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+
         tr.innerHTML = `
-          <td class="p-2.5 text-slate-400">${item.date}</td>
-          <td class="p-2.5 font-bold text-amber-600">${formatFCFA(item.montant)}</td>
-          <td class="p-2.5 text-slate-500 font-mono">${item.code}</td>
+          <td class="p-2.5 font-semibold capitalize text-slate-800 dark:text-slate-200">${moisNom}</td>
+          <td class="p-2.5 font-bold text-blue-600">${formatFCFA(item.montant)}</td>
+          <td class="p-2.5 text-slate-500 font-mono">${item.ref}</td>
           <td class="p-2.5 text-center">
-            <button onclick="deleteWoyofal(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
+            <button onclick="deleteSeneau(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </td>
@@ -855,7 +877,7 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById('totalWoyofalMois').textContent = `Total : ${formatFCFA(totalW)}`;
+      document.getElementById('totalSeneauAnnee').textContent = `Total : ${formatFCFA(totalSeneau)}`;
       lucide.createIcons();
     }
 
@@ -923,7 +945,7 @@
       chartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Charges Fixes (165k)', 'Marché & Eau (70k)', 'Épargne Terrain (65k)'],
+          labels: ['Charges Fixes (165k)', 'Marché & SEN\'EAU (70k)', 'Épargne Terrain (65k)'],
           datasets: [{
             data: [165000, 70000, 65000],
             backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
