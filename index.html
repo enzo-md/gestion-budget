@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget & Dépenses</title>
+  <title>Budget, Terrain & Urgences - Synchronisation Automatique</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Firebase SDKs Compat (Recommandé pour l'application Web sans bundler) -->
+  <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -54,13 +54,19 @@
       background: rgba(16, 185, 129, 0.3);
       border-radius: 4px;
     }
+    @media print {
+      body * { visibility: hidden; }
+      #printableArea, #printableArea * { visibility: visible; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full pb-20 md:pb-8 transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full pb-24 md:pb-8 transition-colors duration-200">
 
-  <!-- HEADER HEADER -->
-  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+  <!-- HEADER -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <div class="bg-brand-500 text-white p-2 rounded-xl shadow-md">
@@ -68,9 +74,9 @@
         </div>
         <div>
           <h1 class="text-base font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-400 dark:to-emerald-200 bg-clip-text text-transparent">
-            Mon Budget & Terrain
+            Mon Budget, Terrain & Urgences
           </h1>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400">Suivi des Dépenses</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">Objectif 2 Ans • 300 000 FCFA Net</p>
         </div>
       </div>
       
@@ -82,8 +88,11 @@
         <button onclick="switchTab('terrain')" id="dtTab-terrain" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
           <i data-lucide="target" class="w-4 h-4"></i> Projet Terrain
         </button>
+        <button onclick="switchTab('woyofal')" id="dtTab-woyofal" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+          <i data-lucide="zap" class="w-4 h-4"></i> Woyofal & Eau
+        </button>
         <button onclick="switchTab('epargne')" id="dtTab-epargne" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
-          <i data-lucide="trending-up" class="w-4 h-4"></i> Épargne & Cumul
+          <i data-lucide="trending-up" class="w-4 h-4"></i> Épargne & Urgences
         </button>
         <button onclick="switchTab('depenses')" id="dtTab-depenses" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
           <i data-lucide="receipt" class="w-4 h-4"></i> Dépenses
@@ -91,10 +100,14 @@
       </nav>
 
       <div class="flex items-center gap-2">
+        <button onclick="window.print()" class="px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Rapport</span>
+        </button>
+
         <!-- Status Synchro -->
         <span id="syncStatus" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-          Connexion Cloud...
+          Connexion...
         </span>
 
         <!-- Theme Toggle -->
@@ -106,34 +119,40 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" id="printableArea">
 
     <!-- ================= BLOC 1 : TABLEAU DE BORD ================= -->
     <div id="section-dashboard" class="tab-content space-y-6">
       
       <!-- Cartes synthétiques -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Salaire Net</span>
-          <div class="text-lg font-black text-slate-900 dark:text-white">300 000 FCFA</div>
+          <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white">300 000 FCFA</div>
           <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Loyer = 0 FCFA</p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
-          <div class="text-lg font-black text-rose-600 dark:text-rose-400">165 000 FCFA</div>
+          <div class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400">165 000 FCFA</div>
           <p class="text-[10px] text-slate-400 mt-1">Scolarité, Épouse, Eau</p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Fonds Urgence</span>
+          <div class="text-base sm:text-lg font-black text-blue-600 dark:text-blue-400" id="dashFondsUrgence">0 FCFA</div>
+          <p class="text-[10px] text-slate-400 mt-1">Sécurité de précaution</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Cible Épargne/Mois</span>
-          <div class="text-lg font-black text-amber-600 dark:text-amber-400" id="dashCibleEpargne">83 333 FCFA</div>
+          <div class="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400" id="dashCibleEpargne">83 333 FCFA</div>
           <p class="text-[10px] text-slate-400 mt-1">Pour Terrain en 2 ans</p>
         </div>
 
-        <div class="bg-gradient-to-br from-brand-600 to-emerald-800 text-white p-4 rounded-2xl shadow-md">
+        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-brand-600 to-emerald-800 text-white p-4 rounded-2xl shadow-md">
           <span class="text-[10px] font-semibold text-emerald-100 uppercase tracking-wider block mb-1">Cumul Épargné</span>
-          <div class="text-lg font-black" id="dashCumulEpargne">0 FCFA</div>
+          <div class="text-base sm:text-lg font-black" id="dashCumulEpargne">0 FCFA</div>
           <p class="text-[10px] text-emerald-100 mt-1" id="dashAvancementTerrain">0% de l'objectif</p>
         </div>
       </div>
@@ -161,23 +180,30 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
               <div class="font-bold mb-1 flex items-center gap-1.5 text-blue-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i> Facture d'Eau (30k)</div>
-              <p class="text-slate-500">Vérifiez les fuites pour ramener l'eau à 15k. Économie directe = 15 000 FCFA de plus vers le terrain.</p>
+              <p class="text-slate-500">Traquez les fuites pour ramener l'eau à 15k. Redirigez l'économie de 15 000 FCFA directement vers l'épargne terrain.</p>
             </div>
             <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
-              <div class="font-bold mb-1 flex items-center gap-1.5 text-amber-500"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Payez-vous en Premier</div>
-              <p class="text-slate-500">Isolez les 65 000 FCFA d'épargne dès le virement du salaire sur un compte séparé.</p>
+              <div class="font-bold mb-1 flex items-center gap-1.5 text-amber-500"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Matelas de Sécurité</div>
+              <p class="text-slate-500">Conservez toujours au moins 50 000 FCFA dans le fonds d'urgence pour éviter de piocher dans le projet terrain.</p>
             </div>
           </div>
-          <button onclick="switchTab('terrain')" class="w-full py-2 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold text-xs rounded-xl hover:bg-brand-100 transition flex items-center justify-center gap-2">
-            Voir le simulateur Terrain complet <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </button>
+          <div class="flex gap-2">
+            <button onclick="switchTab('terrain')" class="flex-1 py-2 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold text-xs rounded-xl hover:bg-brand-100 transition flex items-center justify-center gap-2">
+              Projet Terrain <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <button onclick="switchTab('woyofal')" class="flex-1 py-2 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl hover:bg-amber-100 transition flex items-center justify-center gap-2">
+              Suivi Woyofal <i data-lucide="zap" class="w-4 h-4"></i>
+            </button>
+          </div>
         </div>
       </div>
 
     </div>
 
-    <!-- ================= BLOC 2 : PROJET TERRAIN ================= -->
+    <!-- ================= BLOC 2 : PROJET TERRAIN & SIMULATEUR PRIMES ================= -->
     <div id="section-terrain" class="tab-content hidden space-y-6">
+      
+      <!-- Objectif et Progression -->
       <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-700">
           <div>
@@ -228,15 +254,141 @@
           </div>
         </div>
       </div>
+
+      <!-- SIMULATEUR DE PRIMES & RENTREES EXCEPTIONNELLES -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <form id="formPrime" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Ajouter une Prime / 13e Mois
+          </h3>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Motif / Source</label>
+            <input type="text" id="primeSource" placeholder="ex: Prime de fin d'année, Vente..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Montant Injecté (FCFA)</label>
+            <input type="number" id="primeMontant" min="1000" step="5000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
+          </div>
+          <button type="submit" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+            Injecter la prime dans le projet
+          </button>
+        </form>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Primes Injectées & Accélération</h3>
+            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400" id="gainMoisTotal">0 mois gagné(s)</span>
+          </div>
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-700/60 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Source</th>
+                  <th class="p-2.5 text-right">Montant</th>
+                  <th class="p-2.5 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tablePrimesBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECK-LIST ADMINISTRATIVE DU TERRAIN -->
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="clipboard-check" class="text-brand-500 w-4 h-4"></i> Check-List Sécurité & Juridique Achat Terrain
+          </h3>
+          <span class="text-xs font-bold text-brand-600" id="checklistProgress">0/5 vérifié(s)</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs" id="checklistContainer">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
     </div>
 
-    <!-- ================= BLOC 3 : SUIVI EPARGNE & CUMUL ================= -->
+    <!-- ================= BLOC 3 : WOYOFAL & SUIVI DE L'EAU ================= -->
+    <div id="section-woyofal" class="tab-content hidden space-y-6">
+      
+      <!-- Objectif Eau -->
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-2xl">
+            <i data-lucide="droplet" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Objectif Réduction Eau</h3>
+            <p class="text-xs text-slate-500">Ramener la facture d'eau de 30 000 FCFA à 15 000 FCFA / mois.</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400">Économie Potentielle :</span>
+          <div class="text-base font-black text-emerald-600 dark:text-emerald-400">+ 15 000 FCFA / mois pour le terrain</div>
+        </div>
+      </div>
+
+      <!-- Formulaire Recharges Woyofal -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <form id="formWoyofal" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Recharge Woyofal Électricité
+          </h3>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Date d'Achat</label>
+            <input type="date" id="woyofalDate" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Montant Recharge (FCFA)</label>
+            <input type="number" id="woyofalMontant" value="5000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Code / Remarque (Optionnel)</label>
+            <input type="text" id="woyofalCode" placeholder="ex: Code recharge 20 chiffres..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+          </div>
+          <button type="submit" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+            Consigner la recharge
+          </button>
+        </form>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Historique Woyofal du Mois</h3>
+            <span class="text-xs font-bold text-amber-600 dark:text-amber-400" id="totalWoyofalMois">Total : 0 FCFA</span>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-700/60 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Montant</th>
+                  <th class="p-2.5">Code / Note</th>
+                  <th class="p-2.5 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableWoyofalBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= BLOC 4 : EPARGNE TERRAIN & FONDS D'URGENCE ================= -->
     <div id="section-epargne" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
           <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-500"></i> Nouveau Versement
+            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-500"></i> Nouveau Versement Épargne
           </h3>
           <form id="formEpargne" class="space-y-3">
             <div>
@@ -248,11 +400,11 @@
               <input type="number" id="epargneMontant" value="65000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-brand-500">
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Compte de Stockage</label>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Destination du Fonds</label>
               <select id="epargneDestination" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
                 <option value="Compte Épargne Projet Terrain">Compte Épargne Projet Terrain</option>
+                <option value="Fonds d'Urgence / Sécurité">Fonds d'Urgence / Sécurité</option>
                 <option value="Mobile Money Bloqué">Mobile Money Bloqué</option>
-                <option value="Fonds d'Urgence">Fonds d'Urgence</option>
               </select>
             </div>
             <button type="submit" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
@@ -274,7 +426,7 @@
                   <th class="p-2.5">Mois</th>
                   <th class="p-2.5">Destination</th>
                   <th class="p-2.5 text-right">Versé</th>
-                  <th class="p-2.5 text-right">Cumul</th>
+                  <th class="p-2.5 text-right">Cumul Terrain</th>
                   <th class="p-2.5 text-center">Action</th>
                 </tr>
               </thead>
@@ -288,7 +440,7 @@
       </div>
     </div>
 
-    <!-- ================= BLOC 4 : REGISTRE DES DEPENSES ================= -->
+    <!-- ================= BLOC 5 : REGISTRE DES DEPENSES ================= -->
     <div id="section-depenses" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -296,7 +448,7 @@
           <h3 class="font-bold text-sm text-slate-900 dark:text-white">Ajouter une dépense</h3>
           <div>
             <label class="block text-xs font-medium text-slate-500 mb-1">Motif</label>
-            <input type="text" id="depenseMotif" placeholder="ex: Facture Eau, Woyofal..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            <input type="text" id="depenseMotif" placeholder="ex: Scolarité, Épouse, Eau..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -347,28 +499,31 @@
   </main>
 
   <!-- BARRE DE NAVIGATION MOBILE -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 px-2 py-1 flex justify-around items-center shadow-lg">
-    <button onclick="switchTab('dashboard')" id="mbTab-dashboard" class="flex flex-col items-center py-1 px-3 rounded-xl text-brand-600 dark:text-brand-400">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 px-1 py-1 flex justify-around items-center shadow-lg no-print">
+    <button onclick="switchTab('dashboard')" id="mbTab-dashboard" class="flex flex-col items-center py-1 px-2 rounded-xl text-brand-600 dark:text-brand-400">
       <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-      <span class="text-[10px] font-semibold mt-0.5">Accueil</span>
+      <span class="text-[9px] font-semibold mt-0.5">Accueil</span>
     </button>
-    <button onclick="switchTab('terrain')" id="mbTab-terrain" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+    <button onclick="switchTab('terrain')" id="mbTab-terrain" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="target" class="w-5 h-5"></i>
-      <span class="text-[10px] font-semibold mt-0.5">Terrain</span>
+      <span class="text-[9px] font-semibold mt-0.5">Terrain</span>
     </button>
-    <button onclick="switchTab('epargne')" id="mbTab-epargne" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+    <button onclick="switchTab('woyofal')" id="mbTab-woyofal" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
+      <i data-lucide="zap" class="w-5 h-5"></i>
+      <span class="text-[9px] font-semibold mt-0.5">Woyofal</span>
+    </button>
+    <button onclick="switchTab('epargne')" id="mbTab-epargne" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="trending-up" class="w-5 h-5"></i>
-      <span class="text-[10px] font-semibold mt-0.5">Épargne</span>
+      <span class="text-[9px] font-semibold mt-0.5">Épargne</span>
     </button>
-    <button onclick="switchTab('depenses')" id="mbTab-depenses" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+    <button onclick="switchTab('depenses')" id="mbTab-depenses" class="flex flex-col items-center py-1 px-2 rounded-xl text-slate-400">
       <i data-lucide="receipt" class="w-5 h-5"></i>
-      <span class="text-[10px] font-semibold mt-0.5">Dépenses</span>
+      <span class="text-[9px] font-semibold mt-0.5">Dépenses</span>
     </button>
   </nav>
 
-  <!-- SCRIPT APPLICATION ET FIREBASE SYNCHRO -->
+  <!-- SCRIPT APPLICATION ET FIREBASE AUTOMATIQUE -->
   <script>
-    // --- VOS IDENTIFIANTS FIREBASE EXACTS ---
     const firebaseConfig = {
       apiKey: "AIzaSyCOanyZ4aEoxfC70tJrwbuueyEoSdVul-Y",
       authDomain: "gestion-budget-37347.firebaseapp.com",
@@ -380,51 +535,54 @@
       measurementId: "G-GCWZG771R4"
     };
 
-    // Initialisation
     let db = null;
+    const syncStatus = document.getElementById('syncStatus');
+
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
     } catch(e) {
-      console.log("Erreur initialisation Firebase", e);
+      console.error("Erreur init Firebase:", e);
     }
 
     let activeTab = 'dashboard';
     let targetPrixTerrain = 2000000;
     let epargnesList = [];
     let depensesList = [];
+    let woyofalList = [];
+    let primesList = [];
+    let checklistState = [false, false, false, false, false];
     let chartInstance = null;
+
+    const checklistItems = [
+      "Vérification de la délibération / Titre Foncier à la Mairie ou aux Domaines",
+      "Enquête de voisinage (absence de litige ou double vente)",
+      "Bornage contradictoire effectué par un géomètre agréé",
+      "Établissement de l'acte de vente par devant Notaire",
+      "Paiement des droits d'enregistrement et mutation (~10%)"
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initTheme();
-      setDefaultMonth();
+      setDefaultDates();
       initFirebaseSync();
     });
 
-    // Synchronisation Cloud en Temps Réel
     function initFirebaseSync() {
-      const syncStatus = document.getElementById('syncStatus');
+      if (!db) return;
 
-      if (!db) {
-        syncStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-400"></span> Mode Local';
-        syncStatus.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
-        epargnesList = JSON.parse(localStorage.getItem('app_epargnes_v5')) || [];
-        depensesList = JSON.parse(localStorage.getItem('app_depenses_v5')) || [];
-        renderAll();
-        return;
-      }
-
-      // Écouter les modifications en direct depuis Firebase
       db.ref('budget_data').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
           epargnesList = data.epargnes || [];
           depensesList = data.depenses || [];
+          woyofalList = data.woyofal || [];
+          primesList = data.primes || [];
+          checklistState = data.checklist || [false, false, false, false, false];
           targetPrixTerrain = data.targetTerrain || 2000000;
           document.getElementById('selectPrixTerrain').value = targetPrixTerrain;
         } else {
-          // Données par défaut si la base est vide
           epargnesList = [
             { id: 1, mois: '2026-08', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
             { id: 2, mois: '2026-09', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
@@ -442,41 +600,43 @@
         syncStatus.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
         
         renderAll();
+      }, (error) => {
+        syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> Erreur: ${error.message}`;
+        syncStatus.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800";
       });
     }
 
-    // Sauvegarder vers Cloud & LocalStorage
     function saveData() {
-      localStorage.setItem('app_epargnes_v5', JSON.stringify(epargnesList));
-      localStorage.setItem('app_depenses_v5', JSON.stringify(depensesList));
-
       if (db) {
         db.ref('budget_data').set({
           epargnes: epargnesList,
           depenses: depensesList,
+          woyofal: woyofalList,
+          primes: primesList,
+          checklist: checklistState,
           targetTerrain: targetPrixTerrain
         });
-      } else {
-        renderAll();
       }
+      renderAll();
     }
 
-    // NAVIGATION
     function switchTab(tabId) {
       activeTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`section-${tabId}`).classList.remove('hidden');
 
-      ['dashboard', 'terrain', 'epargne', 'depenses'].forEach(t => {
+      ['dashboard', 'terrain', 'woyofal', 'epargne', 'depenses'].forEach(t => {
         const dtBtn = document.getElementById(`dtTab-${t}`);
         const mbBtn = document.getElementById(`mbTab-${t}`);
         
-        if (t === tabId) {
-          dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition bg-white dark:bg-slate-800 text-brand-600 shadow-sm";
-          mbBtn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-brand-600 dark:text-brand-400 font-bold";
-        } else {
-          dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900";
-          mbBtn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400";
+        if (dtBtn) {
+          if (t === tabId) {
+            dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition bg-white dark:bg-slate-800 text-brand-600 shadow-sm";
+            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-2 rounded-xl text-brand-600 dark:text-brand-400 font-bold";
+          } else {
+            dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900";
+            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-2 rounded-xl text-slate-400";
+          }
         }
       });
 
@@ -489,11 +649,13 @@
       });
     }
 
-    function setDefaultMonth() {
+    function setDefaultDates() {
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
       document.getElementById('epargneMois').value = `${yyyy}-${mm}`;
+      document.getElementById('woyofalDate').value = `${yyyy}-${mm}-${dd}`;
     }
 
     function updateTerrainTarget() {
@@ -510,10 +672,7 @@
 
       if (!mois || isNaN(montant)) return;
 
-      const idx = epargnesList.findIndex(item => item.mois === mois);
-      if (idx !== -1) epargnesList[idx] = { id: Date.now(), mois, montant, destination };
-      else epargnesList.push({ id: Date.now(), mois, montant, destination });
-
+      epargnesList.push({ id: Date.now(), mois, montant, destination });
       epargnesList.sort((a, b) => a.mois.localeCompare(b.mois));
       saveData();
     });
@@ -533,33 +692,72 @@
       saveData();
     });
 
-    window.deleteEpargne = function(id) {
-      epargnesList = epargnesList.filter(item => item.id !== id);
+    document.getElementById('formWoyofal').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = document.getElementById('woyofalDate').value;
+      const montant = parseInt(document.getElementById('woyofalMontant').value);
+      const code = document.getElementById('woyofalCode').value || '-';
+
+      if (!date || isNaN(montant)) return;
+
+      woyofalList.unshift({ id: Date.now(), date, montant, code });
+      document.getElementById('woyofalCode').value = '';
+      saveData();
+    });
+
+    document.getElementById('formPrime').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const source = document.getElementById('primeSource').value;
+      const montant = parseInt(document.getElementById('primeMontant').value);
+      const date = new Date().toISOString().split('T')[0];
+
+      if (!source || isNaN(montant)) return;
+
+      primesList.unshift({ id: Date.now(), date, source, montant });
+      document.getElementById('primeSource').value = '';
+      document.getElementById('primeMontant').value = '';
+      saveData();
+    });
+
+    window.toggleChecklist = function(index) {
+      checklistState[index] = !checklistState[index];
       saveData();
     };
 
-    window.deleteDepense = function(id) {
-      depensesList = depensesList.filter(item => item.id !== id);
-      saveData();
-    };
+    window.deleteEpargne = function(id) { epargnesList = epargnesList.filter(item => item.id !== id); saveData(); };
+    window.deleteDepense = function(id) { depensesList = depensesList.filter(item => item.id !== id); saveData(); };
+    window.deleteWoyofal = function(id) { woyofalList = woyofalList.filter(item => item.id !== id); saveData(); };
+    window.deletePrime = function(id) { primesList = primesList.filter(item => item.id !== id); saveData(); };
 
     function renderAll() {
       renderTerrainProgress();
       renderEpargneTable();
       renderDepensesTable();
+      renderWoyofalTable();
+      renderPrimesTable();
+      renderChecklist();
       renderChart();
     }
 
-    function formatFCFA(val) {
-      return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA';
-    }
+    function formatFCFA(val) { return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA'; }
 
     function renderTerrainProgress() {
-      const totalCumule = epargnesList.reduce((sum, item) => sum + item.montant, 0);
+      const epargneTerrain = epargnesList
+        .filter(item => item.destination !== "Fonds d'Urgence / Sécurité")
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      const totalPrimes = primesList.reduce((sum, item) => sum + item.montant, 0);
+      const totalCumule = epargneTerrain + totalPrimes;
+
       const pourcent = Math.min(100, Math.round((totalCumule / targetPrixTerrain) * 100));
       const reste = Math.max(0, targetPrixTerrain - totalCumule);
       const rythmeRequis = Math.round(targetPrixTerrain / 24);
       const fraisAnnexes = Math.round(targetPrixTerrain * 0.10);
+
+      // Calcul Fonds d'urgence
+      const totalUrgences = epargnesList
+        .filter(item => item.destination === "Fonds d'Urgence / Sécurité")
+        .reduce((sum, item) => sum + item.montant, 0);
 
       document.getElementById('textAvancementPourcent').textContent = pourcent + '%';
       document.getElementById('barreProgressionTerrain').style.width = pourcent + '%';
@@ -571,6 +769,7 @@
       document.getElementById('dashCibleEpargne').textContent = formatFCFA(rythmeRequis);
       document.getElementById('dashCumulEpargne').textContent = formatFCFA(totalCumule);
       document.getElementById('dashAvancementTerrain').textContent = `${pourcent}% de l'objectif terrain`;
+      document.getElementById('dashFondsUrgence').textContent = formatFCFA(totalUrgences);
     }
 
     function renderEpargneTable() {
@@ -579,7 +778,8 @@
       let cumul = 0;
 
       epargnesList.forEach(item => {
-        cumul += item.montant;
+        if (item.destination !== "Fonds d'Urgence / Sécurité") cumul += item.montant;
+
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
 
@@ -601,7 +801,7 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById('countEpargnes').textContent = `${epargnesList.length} mois`;
+      document.getElementById('countEpargnes').textContent = `${epargnesList.length} virement(s)`;
       lucide.createIcons();
     }
 
@@ -630,6 +830,88 @@
 
       document.getElementById('totalDepensesMois').textContent = `Total : ${formatFCFA(totalDep)}`;
       lucide.createIcons();
+    }
+
+    function renderWoyofalTable() {
+      const tbody = document.getElementById('tableWoyofalBody');
+      tbody.innerHTML = '';
+      let totalW = 0;
+
+      woyofalList.forEach(item => {
+        totalW += item.montant;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
+
+        tr.innerHTML = `
+          <td class="p-2.5 text-slate-400">${item.date}</td>
+          <td class="p-2.5 font-bold text-amber-600">${formatFCFA(item.montant)}</td>
+          <td class="p-2.5 text-slate-500 font-mono">${item.code}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="deleteWoyofal(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalWoyofalMois').textContent = `Total : ${formatFCFA(totalW)}`;
+      lucide.createIcons();
+    }
+
+    function renderPrimesTable() {
+      const tbody = document.getElementById('tablePrimesBody');
+      tbody.innerHTML = '';
+      let totalP = 0;
+
+      primesList.forEach(item => {
+        totalP += item.montant;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
+
+        tr.innerHTML = `
+          <td class="p-2.5 text-slate-400">${item.date}</td>
+          <td class="p-2.5 font-medium text-slate-800 dark:text-slate-200">${item.source}</td>
+          <td class="p-2.5 text-right font-bold text-emerald-600">+ ${formatFCFA(item.montant)}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="deletePrime(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const moisGagnes = (totalP / (targetPrixTerrain / 24)).toFixed(1);
+      document.getElementById('gainMoisTotal').textContent = `${moisGagnes} mois gagné(s)`;
+      lucide.createIcons();
+    }
+
+    function renderChecklist() {
+      const container = document.getElementById('checklistContainer');
+      container.innerHTML = '';
+      let doneCount = 0;
+
+      checklistItems.forEach((text, idx) => {
+        const isChecked = checklistState[idx];
+        if (isChecked) doneCount++;
+
+        const div = document.createElement('div');
+        div.className = `p-3 rounded-xl border flex items-start gap-2.5 cursor-pointer transition ${
+          isChecked 
+            ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-slate-800 dark:text-slate-200' 
+            : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 text-slate-500'
+        }`;
+        div.onclick = () => toggleChecklist(idx);
+
+        div.innerHTML = `
+          <input type="checkbox" ${isChecked ? 'checked' : ''} class="mt-0.5 rounded text-brand-600 focus:ring-brand-500">
+          <span class="${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : ''}">${text}</span>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('checklistProgress').textContent = `${doneCount}/5 vérifié(s)`;
     }
 
     function renderChart() {
