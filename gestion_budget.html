@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget & Terrain - Application Menu</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(16, 185, 129, 0.3);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full pb-20 md:pb-8 transition-colors duration-200">
+
+  <!-- HEADER HEADER -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-brand-500 text-white p-2 rounded-xl shadow-md">
+          <i data-lucide="land-plot" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-400 dark:to-emerald-200 bg-clip-text text-transparent">
+            Mon Budget
+          </h1>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">Tableau Suivi Dépense</p>
+        </div>
+      </div>
+      
+      <!-- MENU DESKTOP (Cache sur mobile) -->
+      <nav class="hidden md:flex items-center bg-slate-100 dark:bg-slate-700/60 p-1 rounded-xl gap-1">
+        <button onclick="switchTab('dashboard')" id="dtTab-dashboard" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition bg-white dark:bg-slate-800 text-brand-600 shadow-sm">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tableau de bord
+        </button>
+        <button onclick="switchTab('terrain')" id="dtTab-terrain" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+          <i data-lucide="target" class="w-4 h-4"></i> Projet Terrain
+        </button>
+        <button onclick="switchTab('epargne')" id="dtTab-epargne" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+          <i data-lucide="trending-up" class="w-4 h-4"></i> Épargne & Cumul
+        </button>
+        <button onclick="switchTab('depenses')" id="dtTab-depenses" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+          <i data-lucide="receipt" class="w-4 h-4"></i> Dépenses
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <!-- Mode Sombre Toggle -->
+        <button id="themeToggle" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <i data-lucide="moon" id="themeIconMoon" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="sun" id="themeIconSun" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ================= BLOC 1 : TABLEAU DE BORD ================= -->
+    <div id="section-dashboard" class="tab-content space-y-6">
+      
+      <!-- Cartes synthétiques -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Salaire Net</span>
+          <div class="text-lg font-black text-slate-900 dark:text-white">300 000 FCFA</div>
+          <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Loyer = 0 FCFA</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
+          <div class="text-lg font-black text-rose-600 dark:text-rose-400">165 000 FCFA</div>
+          <p class="text-[10px] text-slate-400 mt-1">Scolarité, Épouse, Eau</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Cible Épargne/Mois</span>
+          <div class="text-lg font-black text-amber-600 dark:text-amber-400" id="dashCibleEpargne">65 000 FCFA</div>
+          <p class="text-[10px] text-slate-400 mt-1">Pour Terrain en 2 ans</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-brand-600 to-emerald-800 text-white p-4 rounded-2xl shadow-md">
+          <span class="text-[10px] font-semibold text-emerald-100 uppercase tracking-wider block mb-1">Cumul Épargné</span>
+          <div class="text-lg font-black" id="dashCumulEpargne">0 FCFA</div>
+          <p class="text-[10px] text-emerald-100 mt-1" id="dashAvancementTerrain">0% de l'objectif</p>
+        </div>
+      </div>
+
+      <!-- Graphique & Synthèse -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-2">Répartition Budgétaire</h3>
+            <div class="relative w-full aspect-square max-w-[200px] mx-auto my-2">
+              <canvas id="budgetChart"></canvas>
+            </div>
+          </div>
+          <div class="space-y-1.5 text-xs pt-3 border-t border-slate-100 dark:border-slate-700">
+            <div class="flex justify-between"><span class="text-slate-500">Charges Fixes (55%)</span><span class="font-bold">165 000 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Marché / Électricité (23.3%)</span><span class="font-bold">70 000 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Épargne Terrain (21.7%)</span><span class="font-bold text-emerald-600">65 000 FCFA</span></div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="compass" class="text-brand-500 w-4 h-4"></i> Recommandations Express de l'Expert
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
+              <div class="font-bold mb-1 flex items-center gap-1.5 text-blue-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i> Facture d'Eau (30k)</div>
+              <p class="text-slate-500">Vérifiez les fuites pour ramener l'eau à 15k. Économie directe = 15 000 FCFA de plus vers le terrain.</p>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
+              <div class="font-bold mb-1 flex items-center gap-1.5 text-amber-500"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Payez-vous en Premier</div>
+              <p class="text-slate-500">Isolez les 65 000 FCFA d'épargne dès le virement du salaire sur un compte séparé.</p>
+            </div>
+          </div>
+          <button onclick="switchTab('terrain')" class="w-full py-2 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold text-xs rounded-xl hover:bg-brand-100 transition flex items-center justify-center gap-2">
+            Voir le simulateur Terrain complet <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= BLOC 2 : PROJET TERRAIN ================= -->
+    <div id="section-terrain" class="tab-content hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-700">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="land-plot" class="text-brand-500 w-5 h-5"></i> Objectif Terrain (Horizon 24 Mois)
+            </h2>
+            <p class="text-xs text-slate-500">Progression vers votre propriété immobilière.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+            <label class="text-xs font-medium text-slate-500">Cible :</label>
+            <select id="selectPrixTerrain" onchange="updateTerrainTarget()" class="text-xs font-bold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+              <option value="1500000">1 500 000 FCFA</option>
+              <option value="2000000" selected>2 000 000 FCFA</option>
+              <option value="2500000">2 500 000 FCFA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex justify-between items-end text-xs">
+            <div>
+              <span class="text-slate-400 font-medium">Avancement Global</span>
+              <div class="text-2xl font-black text-brand-600 dark:text-brand-400" id="textAvancementPourcent">0%</div>
+            </div>
+            <div class="text-right">
+              <span class="text-slate-400">Reste à Épargner :</span>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200" id="textResteAEpargner">2 000 000 FCFA</div>
+            </div>
+          </div>
+
+          <div class="w-full h-3.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden p-0.5">
+            <div id="barreProgressionTerrain" class="h-full bg-gradient-to-r from-brand-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400">Versement Effectués :</span>
+              <p class="font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5" id="textMoisCumules">0 / 24 Mois</p>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400">Rythme Mensuel Cible :</span>
+              <p class="font-bold text-amber-600 dark:text-amber-400 text-sm mt-0.5" id="textRythmeRequis">83 333 FCFA / mois</p>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400">Frais d'Acte Prévus (~10%) :</span>
+              <p class="font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5" id="textFraisAnnexes">200 000 FCFA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= BLOC 3 : SUIVI EPARGNE & CUMUL ================= -->
+    <div id="section-epargne" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-500"></i> Nouveau Versement
+          </h3>
+          <form id="formEpargne" class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Mois & Année</label>
+              <input type="month" id="epargneMois" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Montant Versé (FCFA)</label>
+              <input type="number" id="epargneMontant" value="65000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Compte de Stockage</label>
+              <select id="epargneDestination" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+                <option value="Compte Épargne Projet Terrain">Compte Épargne Projet Terrain</option>
+                <option value="Mobile Money Bloqué">Mobile Money Bloqué</option>
+                <option value="Fonds d'Urgence">Fonds d'Urgence</option>
+              </select>
+            </div>
+            <button type="submit" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+              Enregistrer le versement
+            </button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Historique & Cumul Glissant</h3>
+            <span class="text-xs text-slate-400" id="countEpargnes">0 mois</span>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-700/60 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="p-2.5">Mois</th>
+                  <th class="p-2.5">Destination</th>
+                  <th class="p-2.5 text-right">Versé</th>
+                  <th class="p-2.5 text-right">Cumul</th>
+                  <th class="p-2.5 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableEpargneBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= BLOC 4 : REGISTRE DES DEPENSES ================= -->
+    <div id="section-depenses" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <form id="formDepense" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white">Ajouter une dépense</h3>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Motif</label>
+            <input type="text" id="depenseMotif" placeholder="ex: Facture Eau, Woyofal..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Montant (FCFA)</label>
+              <input type="number" id="depenseMontant" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
+              <select id="depenseCategorie" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+                <option value="Charges Fixes">Charges Fixes</option>
+                <option value="Eau / Électricité">Eau / Électricité</option>
+                <option value="Marché / Nourriture">Marché / Nourriture</option>
+                <option value="Divers">Divers</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+            Valider la dépense
+          </button>
+        </form>
+
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Journal des dépenses</h3>
+            <span class="text-xs text-slate-500" id="totalDepensesMois">Total : 0 FCFA</span>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl max-h-64 custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-700/60 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Motif</th>
+                  <th class="p-2.5 text-right">Montant</th>
+                  <th class="p-2.5 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableDepensesBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= BARRE DE NAVIGATION MOBILE (FIXED BOTTOM) ================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 px-2 py-1 flex justify-around items-center shadow-lg">
+    <button onclick="switchTab('dashboard')" id="mbTab-dashboard" class="flex flex-col items-center py-1 px-3 rounded-xl text-brand-600 dark:text-brand-400">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Accueil</span>
+    </button>
+    <button onclick="switchTab('terrain')" id="mbTab-terrain" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+      <i data-lucide="target" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Terrain</span>
+    </button>
+    <button onclick="switchTab('epargne')" id="mbTab-epargne" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+      <i data-lucide="trending-up" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Épargne</span>
+    </button>
+    <button onclick="switchTab('depenses')" id="mbTab-depenses" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400">
+      <i data-lucide="receipt" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Dépenses</span>
+    </button>
+  </nav>
+
+  <!-- SCRIPT APPLICATION -->
+  <script>
+    let activeTab = 'dashboard';
+    let targetPrixTerrain = parseInt(localStorage.getItem('app_target_terrain')) || 2000000;
+    
+    let epargnesList = JSON.parse(localStorage.getItem('app_epargnes_v4')) || [
+      { id: 1, mois: '2026-08', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
+      { id: 2, mois: '2026-09', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
+      { id: 3, mois: '2026-10', montant: 65000, destination: 'Compte Épargne Projet Terrain' }
+    ];
+
+    let depensesList = JSON.parse(localStorage.getItem('app_depenses_v4')) || [
+      { id: 1, date: '2026-10-02', motif: 'Scolarité Enfants', montant: 65000, categorie: 'Charges Fixes' },
+      { id: 2, date: '2026-10-03', motif: 'Budget Épouse', montant: 70000, categorie: 'Charges Fixes' },
+      { id: 3, date: '2026-10-05', motif: 'Facture d\'Eau', montant: 30000, categorie: 'Eau / Électricité' }
+    ];
+
+    let chartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initTheme();
+      setDefaultMonth();
+      document.getElementById('selectPrixTerrain').value = targetPrixTerrain;
+      renderAll();
+    });
+
+    // NAVIGATION PAR ONGLET / MENU
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`section-${tabId}`).classList.remove('hidden');
+
+      // Style des boutons Desktop
+      ['dashboard', 'terrain', 'epargne', 'depenses'].forEach(t => {
+        const dtBtn = document.getElementById(`dtTab-${t}`);
+        const mbBtn = document.getElementById(`mbTab-${t}`);
+        
+        if (t === tabId) {
+          dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition bg-white dark:bg-slate-800 text-brand-600 shadow-sm";
+          mbBtn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-brand-600 dark:text-brand-400 font-bold";
+        } else {
+          dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900";
+          mbBtn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400";
+        }
+      });
+
+      if (tabId === 'dashboard') renderChart();
+    }
+
+    function initTheme() {
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+    }
+
+    function setDefaultMonth() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      document.getElementById('epargneMois').value = `${yyyy}-${mm}`;
+    }
+
+    function updateTerrainTarget() {
+      targetPrixTerrain = parseInt(document.getElementById('selectPrixTerrain').value);
+      localStorage.setItem('app_target_terrain', targetPrixTerrain);
+      renderAll();
+    }
+
+    // FORMULAIRES
+    document.getElementById('formEpargne').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const mois = document.getElementById('epargneMois').value;
+      const montant = parseInt(document.getElementById('epargneMontant').value);
+      const destination = document.getElementById('epargneDestination').value;
+
+      if (!mois || isNaN(montant)) return;
+
+      const idx = epargnesList.findIndex(item => item.mois === mois);
+      if (idx !== -1) epargnesList[idx] = { id: Date.now(), mois, montant, destination };
+      else epargnesList.push({ id: Date.now(), mois, montant, destination });
+
+      epargnesList.sort((a, b) => a.mois.localeCompare(b.mois));
+      saveAndRender();
+    });
+
+    document.getElementById('formDepense').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const motif = document.getElementById('depenseMotif').value;
+      const montant = parseInt(document.getElementById('depenseMontant').value);
+      const categorie = document.getElementById('depenseCategorie').value;
+      const date = new Date().toISOString().split('T')[0];
+
+      if (!motif || isNaN(montant)) return;
+
+      depensesList.unshift({ id: Date.now(), date, motif, montant, categorie });
+      document.getElementById('depenseMotif').value = '';
+      document.getElementById('depenseMontant').value = '';
+      saveAndRender();
+    });
+
+    window.deleteEpargne = function(id) {
+      epargnesList = epargnesList.filter(item => item.id !== id);
+      saveAndRender();
+    };
+
+    window.deleteDepense = function(id) {
+      depensesList = depensesList.filter(item => item.id !== id);
+      saveAndRender();
+    };
+
+    function saveAndRender() {
+      localStorage.setItem('app_epargnes_v4', JSON.stringify(epargnesList));
+      localStorage.setItem('app_depenses_v4', JSON.stringify(depensesList));
+      renderAll();
+    }
+
+    function renderAll() {
+      renderTerrainProgress();
+      renderEpargneTable();
+      renderDepensesTable();
+      renderChart();
+    }
+
+    function formatFCFA(val) {
+      return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA';
+    }
+
+    function renderTerrainProgress() {
+      const totalCumule = epargnesList.reduce((sum, item) => sum + item.montant, 0);
+      const pourcent = Math.min(100, Math.round((totalCumule / targetPrixTerrain) * 100));
+      const reste = Math.max(0, targetPrixTerrain - totalCumule);
+      const rythmeRequis = Math.round(targetPrixTerrain / 24);
+      const fraisAnnexes = Math.round(targetPrixTerrain * 0.10);
+
+      document.getElementById('textAvancementPourcent').textContent = pourcent + '%';
+      document.getElementById('barreProgressionTerrain').style.width = pourcent + '%';
+      document.getElementById('textResteAEpargner').textContent = formatFCFA(reste);
+      document.getElementById('textMoisCumules').textContent = `${epargnesList.length} / 24 Mois`;
+      document.getElementById('textRythmeRequis').textContent = formatFCFA(rythmeRequis) + ' / mois';
+      document.getElementById('textFraisAnnexes').textContent = formatFCFA(fraisAnnexes);
+      
+      document.getElementById('dashCibleEpargne').textContent = formatFCFA(rythmeRequis);
+      document.getElementById('dashCumulEpargne').textContent = formatFCFA(totalCumule);
+      document.getElementById('dashAvancementTerrain').textContent = `${pourcent}% de l'objectif terrain`;
+    }
+
+    function renderEpargneTable() {
+      const tbody = document.getElementById('tableEpargneBody');
+      tbody.innerHTML = '';
+      let cumul = 0;
+
+      epargnesList.forEach(item => {
+        cumul += item.montant;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
+
+        const [year, month] = item.mois.split('-');
+        const dateObj = new Date(year, month - 1);
+        const moisNom = dateObj.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold capitalize text-slate-800 dark:text-slate-200">${moisNom}</td>
+          <td class="p-2.5 text-slate-400">${item.destination}</td>
+          <td class="p-2.5 text-right font-bold text-emerald-600">+ ${formatFCFA(item.montant)}</td>
+          <td class="p-2.5 text-right font-black text-slate-900 dark:text-white">${formatFCFA(cumul)}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="deleteEpargne(${item.id})" class="text-rose-500 hover:text-rose-700 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('countEpargnes').textContent = `${epargnesList.length} mois`;
+      lucide.createIcons();
+    }
+
+    function renderDepensesTable() {
+      const tbody = document.getElementById('tableDepensesBody');
+      tbody.innerHTML = '';
+      let totalDep = 0;
+
+      depensesList.forEach(item => {
+        totalDep += item.montant;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30";
+
+        tr.innerHTML = `
+          <td class="p-2.5 text-slate-400">${item.date}</td>
+          <td class="p-2.5 font-medium text-slate-800 dark:text-slate-200">${item.motif}</td>
+          <td class="p-2.5 text-right font-semibold text-rose-600">- ${formatFCFA(item.montant)}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="deleteDepense(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
+              <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalDepensesMois').textContent = `Total : ${formatFCFA(totalDep)}`;
+      lucide.createIcons();
+    }
+
+    function renderChart() {
+      const canvas = document.getElementById('budgetChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Charges Fixes (165k)', 'Marché & Eau (70k)', 'Épargne Terrain (65k)'],
+          datasets: [{
+            data: [165000, 70000, 65000],
+            backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          cutout: '70%'
+        }
+      });
+    }
+  </script>
+</body>
+</html>
