@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget, Epargne & Bourse BRVM</title>
+  <title>Budget & Epargne</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -76,7 +76,7 @@
           <h1 class="text-base font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-400 dark:to-emerald-200 bg-clip-text text-transparent">
             Mon Budget & Bourse
           </h1>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400">Veille & Patrimoine</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400"> Veille & Patrimoine</p>
         </div>
       </div>
       
@@ -141,10 +141,11 @@
           <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium"> </p>
         </div>
 
+        <!-- CARTE DYNAMIQUE CHARGES FIXES -->
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
-          <div class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400">165 000 FCFA</div>
-          <p class="text-[10px] text-slate-400 mt-1"> </p>
+          <div class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400" id="displayChargesFixes">0 FCFA</div>
+          <p class="text-[10px] text-slate-400 mt-1" id="labelMoisChargesFixes">Mois en cours</p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
@@ -170,15 +171,15 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-2">Répartition Budgétaire</h3>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-2">Répartition du Mois</h3>
             <div class="relative w-full aspect-square max-w-[200px] mx-auto my-2">
               <canvas id="budgetChart"></canvas>
             </div>
           </div>
           <div class="space-y-1.5 text-xs pt-3 border-t border-slate-100 dark:border-slate-700">
-            <div class="flex justify-between"><span class="text-slate-500">Charges Fixes (55%)</span><span class="font-bold">165 000 FCFA</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Marché & SEN'EAU (23.3%)</span><span class="font-bold">70 000 FCFA</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Épargne / Bourse (21.7%)</span><span class="font-bold text-emerald-600">65 000 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Charges Fixes</span><span class="font-bold text-rose-600" id="chartValueFixes">0 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Marché & SEN'EAU</span><span class="font-bold text-amber-600" id="chartValueMarche">0 FCFA</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Épargne Terrain / Bourse</span><span class="font-bold text-emerald-600" id="chartValueEpargne">0 FCFA</span></div>
           </div>
         </div>
 
@@ -632,7 +633,7 @@
     </button>
   </nav>
 
-  <!-- SCRIPT APPLICATION ET FIREBASE AUTOMATIQUE -->
+  <!-- SCRIPT APPLICATION DYNAMIQUE -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCOanyZ4aEoxfC70tJrwbuueyEoSdVul-Y",
@@ -681,42 +682,44 @@
       initFirebaseSync();
     });
 
+    function getCurrentMonthKey() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      return `${yyyy}-${mm}`;
+    }
+
+    function getCurrentMonthName() {
+      const today = new Date();
+      return today.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    }
+
     function initFirebaseSync() {
       if (!db) return;
 
       db.ref('budget_data').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          salaireNet = data.salaireNet || 300000;
-          epargnesList = data.epargnes || [];
-          depensesList = data.depenses || [];
-          seneauList = data.seneau || [];
-          primesList = data.primes || [];
-          bourseList = data.bourse || [];
-          checklistState = data.checklist || [false, false, false, false, false];
-          targetPrixTerrain = data.targetTerrain || 2000000;
-          document.getElementById('selectPrixTerrain').value = targetPrixTerrain;
-        } else {
-          salaireNet = 300000;
-          epargnesList = [
-            { id: 1, mois: '2026-08', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
-            { id: 2, mois: '2026-09', montant: 65000, destination: 'Compte Épargne Projet Terrain' },
-            { id: 3, mois: '2026-10', montant: 65000, destination: 'Compte Épargne Projet Terrain' }
-          ];
-          depensesList = [
-            { id: 1, date: '2026-10-02', motif: 'Scolarité Enfants', montant: 65000, categorie: 'Charges Fixes' },
-            { id: 2, date: '2026-10-03', motif: 'Budget Épouse', montant: 70000, categorie: 'Charges Fixes' },
-            { id: 3, date: '2026-10-05', motif: 'Facture SEN\'EAU', montant: 30000, categorie: 'SEN\'EAU' }
-          ];
-          saveData();
-        }
+        const data = snapshot.val() || {};
+
+        salaireNet = typeof data.salaireNet === 'number' ? data.salaireNet : 300000;
+        targetPrixTerrain = typeof data.targetTerrain === 'number' ? data.targetTerrain : 2000000;
         
+        epargnesList = Array.isArray(data.epargnes) ? data.epargnes : [];
+        depensesList = Array.isArray(data.depenses) ? data.depenses : [];
+        seneauList = Array.isArray(data.seneau) ? data.seneau : [];
+        primesList = Array.isArray(data.primes) ? data.primes : [];
+        bourseList = Array.isArray(data.bourse) ? data.bourse : [];
+        checklistState = Array.isArray(data.checklist) ? data.checklist : [false, false, false, false, false];
+
+        const selectPrix = document.getElementById('selectPrixTerrain');
+        if (selectPrix) selectPrix.value = targetPrixTerrain;
+
         syncStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Synchro Cloud Active';
         syncStatus.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
-        
+
         renderAll();
       }, (error) => {
-        syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> Erreur: ${error.message}`;
+        console.error("Erreur Synchro Firebase:", error);
+        syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> Erreur Synchro`;
         syncStatus.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800";
       });
     }
@@ -873,6 +876,17 @@
 
     function renderAll() {
       document.getElementById('displaySalaireNet').textContent = formatFCFA(salaireNet);
+      
+      // CHARGES FIXES ET CALCULS DYNAMIQUES DU MOIS EN COURS
+      const currentMonthKey = getCurrentMonthKey();
+      
+      const chargesFixesMoisEnCours = depensesList
+        .filter(item => item.date && item.date.startsWith(currentMonthKey) && item.categorie === 'Charges Fixes')
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      document.getElementById('displayChargesFixes').textContent = formatFCFA(chargesFixesMoisEnCours);
+      document.getElementById('labelMoisChargesFixes').textContent = `Mois actuel (${getCurrentMonthName()})`;
+
       renderTerrainProgress();
       renderEpargneTable();
       renderDepensesTable();
@@ -909,7 +923,6 @@
       document.getElementById('textRythmeRequis').textContent = formatFCFA(rythmeRequis) + ' / mois';
       document.getElementById('textFraisAnnexes').textContent = formatFCFA(fraisAnnexes);
       
-      document.getElementById('dashCibleEpargne').textContent = formatFCFA(rythmeRequis);
       document.getElementById('dashCumulEpargne').textContent = formatFCFA(totalCumule);
       document.getElementById('dashAvancementTerrain').textContent = `${pourcent}% de l'objectif terrain`;
       document.getElementById('dashFondsUrgence').textContent = formatFCFA(totalUrgences);
@@ -1124,12 +1137,30 @@
       const ctx = canvas.getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
+      const currentMonthKey = getCurrentMonthKey();
+
+      const chargesFixes = depensesList
+        .filter(item => item.date && item.date.startsWith(currentMonthKey) && item.categorie === 'Charges Fixes')
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      const marcheSeneau = depensesList
+        .filter(item => item.date && item.date.startsWith(currentMonthKey) && (item.categorie === 'Marché / Nourriture' || item.categorie === 'SEN\'EAU'))
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      const epargneDuMois = epargnesList
+        .filter(item => item.mois === currentMonthKey)
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      document.getElementById('chartValueFixes').textContent = formatFCFA(chargesFixes);
+      document.getElementById('chartValueMarche').textContent = formatFCFA(marcheSeneau);
+      document.getElementById('chartValueEpargne').textContent = formatFCFA(epargneDuMois);
+
       chartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Charges Fixes (165k)', 'Marché & SEN\'EAU (70k)', 'Épargne Terrain / Bourse (65k)'],
+          labels: ['Charges Fixes', 'Marché & SEN\'EAU', 'Épargne Terrain / Bourse'],
           datasets: [{
-            data: [165000, 70000, 65000],
+            data: [chargesFixes, marcheSeneau, epargneDuMois],
             backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
             borderWidth: 0
           }]
