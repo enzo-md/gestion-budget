@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget & Epargne</title>
+  <title>Budget, Terrain, SEN'EAU & Bourse BRVM</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -74,9 +74,9 @@
         </div>
         <div>
           <h1 class="text-base font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-400 dark:to-emerald-200 bg-clip-text text-transparent">
-            Mon Budget & Bourse
+            Mon Budget, Terrain & Bourse
           </h1>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400"> Veille & Patrimoine</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">Objectif 2 Ans • Veille & Patrimoine</p>
         </div>
       </div>
       
@@ -127,52 +127,81 @@
     <!-- ================= BLOC 1 : TABLEAU DE BORD ================= -->
     <div id="section-dashboard" class="tab-content space-y-6">
       
-      <!-- Cartes synthétiques -->
-      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-        
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Salaire Net</span>
-            <button onclick="editSalaireNet()" class="text-brand-600 hover:text-brand-700 p-0.5 no-print" title="Modifier le salaire">
-              <i data-lucide="pencil" class="w-3 h-3"></i>
-            </button>
-          </div>
-          <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white" id="displaySalaireNet">300 000 FCFA</div>
-          <p class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium"> </p>
+      <!-- SÉLECTEUR DYNAMIQUE DE MOIS -->
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="calendar" class="w-5 h-5 text-brand-600"></i>
+          <span class="text-xs font-semibold text-slate-500">Période d'analyse :</span>
         </div>
-
-        <!-- CARTE DYNAMIQUE CHARGES FIXES -->
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
-          <div class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400" id="displayChargesFixes">0 FCFA</div>
-          <p class="text-[10px] text-slate-400 mt-1" id="labelMoisChargesFixes">Mois en cours</p>
-        </div>
-
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Portefeuille Bourse</span>
-          <div class="text-base sm:text-lg font-black text-purple-600 dark:text-purple-400" id="dashTotalBourse">0 FCFA</div>
-          <p class="text-[10px] text-slate-400 mt-1" id="dashActionsSonatelCount">0 action(s) Sonatel</p>
-        </div>
-
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Fonds Urgence</span>
-          <div class="text-base sm:text-lg font-black text-blue-600 dark:text-blue-400" id="dashFondsUrgence">0 FCFA</div>
-          <p class="text-[10px] text-slate-400 mt-1">Sécurité de précaution</p>
-        </div>
-
-        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-brand-600 to-emerald-800 text-white p-4 rounded-2xl shadow-md">
-          <span class="text-[10px] font-semibold text-emerald-100 uppercase tracking-wider block mb-1">Cumul Épargne Terrain</span>
-          <div class="text-base sm:text-lg font-black" id="dashCumulEpargne">0 FCFA</div>
-          <p class="text-[10px] text-emerald-100 mt-1" id="dashAvancementTerrain">0% de l'objectif</p>
+        <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <button onclick="prevMonth()" class="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition text-slate-600 dark:text-slate-300">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <span id="currentMonthLabel" class="text-xs font-bold px-2 capitalize text-slate-900 dark:text-white">Octobre 2026</span>
+          <button onclick="nextMonth()" class="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition text-slate-600 dark:text-slate-300">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Graphique & Synthèse -->
+      <!-- ALERTES INTELLIGENTES -->
+      <div id="alertsContainer" class="space-y-2">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Cartes synthétiques (6 Cartes) -->
+      <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        
+        <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Salaire Net</span>
+            <button onclick="editSalaireNet()" class="text-brand-600 hover:text-brand-700 p-0.5 no-print" title="Modifier">
+              <i data-lucide="pencil" class="w-3 h-3"></i>
+            </button>
+          </div>
+          <div class="text-sm sm:text-base font-black text-slate-900 dark:text-white" id="displaySalaireNet">300 000 FCFA</div>
+          <p class="text-[9px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Loyer = 0 FCFA</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Charges Fixes</span>
+          <div class="text-sm sm:text-base font-black text-rose-600 dark:text-rose-400" id="displayChargesFixes">0 FCFA</div>
+          <p class="text-[9px] text-slate-400 mt-1">Du mois sélectionné</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Reste à Vivre</span>
+          <div class="text-sm sm:text-base font-black text-emerald-600 dark:text-emerald-400" id="displayResteAVivre">0 FCFA</div>
+          <p class="text-[9px] text-slate-400 mt-1">Disponible sur le mois</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Portefeuille Bourse</span>
+          <div class="text-sm sm:text-base font-black text-purple-600 dark:text-purple-400" id="dashTotalBourse">0 FCFA</div>
+          <p class="text-[9px] text-slate-400 mt-1" id="dashActionsSonatelCount">0 action(s) Sonatel</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
+          <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Fonds Urgence</span>
+          <div class="text-sm sm:text-base font-black text-blue-600 dark:text-blue-400" id="dashFondsUrgence">0 FCFA</div>
+          <p class="text-[9px] text-slate-400 mt-1">Sécurité de précaution</p>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-brand-600 to-emerald-800 text-white p-3.5 rounded-2xl shadow-md">
+          <span class="text-[9px] font-semibold text-emerald-100 uppercase tracking-wider block mb-1">Cumul Épargne Terrain</span>
+          <div class="text-sm sm:text-base font-black" id="dashCumulEpargne">0 FCFA</div>
+          <p class="text-[9px] text-emerald-100 mt-1" id="dashAvancementTerrain">0% de l'objectif</p>
+        </div>
+      </div>
+
+      <!-- Graphique Répartition & Courbe d'Évolution Terrain -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Doughnut Chart -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
           <div>
             <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-2">Répartition du Mois</h3>
-            <div class="relative w-full aspect-square max-w-[200px] mx-auto my-2">
+            <div class="relative w-full aspect-square max-w-[180px] mx-auto my-2">
               <canvas id="budgetChart"></canvas>
             </div>
           </div>
@@ -183,29 +212,27 @@
           </div>
         </div>
 
+        <!-- Line Chart Progression Terrain -->
         <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
-          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <i data-lucide="compass" class="text-brand-500 w-4 h-4"></i> Conseil Stratégie Patrimoine
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
-              <div class="font-bold mb-1 flex items-center gap-1.5 text-purple-600"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Investissement Sonatel (BRVM)</div>
-              <p class="text-slate-500">Acheter des actions Sonatel permet de percevoir des dividendes annuels récurrents pour faire fructifier votre patrimoine en parallèle du projet terrain.</p>
-            </div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700/60">
-              <div class="font-bold mb-1 flex items-center gap-1.5 text-blue-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i> Facture SEN'EAU</div>
-              <p class="text-slate-500">Traquez les fuites pour ramener la SEN'EAU à 15k. Injectez l'économie réalisée directement en actions ou en épargne terrain.</p>
-            </div>
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="trending-up" class="text-brand-500 w-4 h-4"></i> Évolution Cumulée de l'Épargne Terrain
+            </h3>
+            <span class="text-xs font-bold text-brand-600" id="lineChartCibleLabel">Cible : 2 000 000 FCFA</span>
           </div>
-          <div class="flex gap-2">
+          <div class="relative w-full h-56">
+            <canvas id="progressionLineChart"></canvas>
+          </div>
+          <div class="flex gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
             <button onclick="switchTab('terrain')" class="flex-1 py-2 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 font-semibold text-xs rounded-xl hover:bg-brand-100 transition flex items-center justify-center gap-2">
-              Projet Terrain <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              Accéder au Projet Terrain <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
             <button onclick="switchTab('bourse')" class="flex-1 py-2 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 font-semibold text-xs rounded-xl hover:bg-purple-100 transition flex items-center justify-center gap-2">
               Espace Bourse BRVM <i data-lucide="trending-up" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
+
       </div>
 
     </div>
@@ -504,11 +531,11 @@
           <form id="formEpargne" class="space-y-3">
             <div>
               <label class="block text-xs font-medium text-slate-500 mb-1">Mois & Année</label>
-              <input type="month" id="epargneMois" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500">
+              <input type="month" id="epargneMois" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-500 mb-1">Montant Versé (FCFA)</label>
-              <input type="number" id="epargneMontant" value="65000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-brand-500">
+              <input type="number" id="epargneMontant" value="65000" min="1000" step="1000" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-500 mb-1">Destination du Fonds</label>
@@ -609,6 +636,59 @@
 
   </main>
 
+  <!-- BOUTON FLOTTANT DE SAISIE RAPIDE (+) -->
+  <button onclick="openQuickAddModal()" class="fixed bottom-20 md:bottom-8 right-5 bg-brand-600 hover:bg-brand-700 text-white p-3.5 rounded-full shadow-2xl z-50 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 no-print" title="Saisie Rapide">
+    <i data-lucide="plus" class="w-6 h-6"></i>
+  </button>
+
+  <!-- MODALE SAISIE RAPIDE -->
+  <div id="quickAddModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-md p-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Saisie Rapide Express
+        </h3>
+        <button onclick="closeQuickAddModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formQuickAdd" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Type d'opération</label>
+          <select id="quickType" onchange="toggleQuickFields()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none font-bold">
+            <option value="depense">Dépense (Courante / Charge)</option>
+            <option value="epargne">Versement Épargne Terrain</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Motif / Intitulé</label>
+          <input type="text" id="quickMotif" placeholder="ex: Courses marché, Virement terrain..." required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Montant (FCFA)</label>
+          <input type="number" id="quickMontant" min="500" step="500" required class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold outline-none">
+        </div>
+
+        <div id="quickCategoryContainer">
+          <label class="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
+          <select id="quickCategorie" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none">
+            <option value="Charges Fixes">Charges Fixes</option>
+            <option value="Marché / Nourriture">Marché / Nourriture</option>
+            <option value="SEN'EAU">SEN'EAU</option>
+            <option value="Divers">Divers</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition mt-2">
+          Enregistrer instantanément
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- BARRE DE NAVIGATION MOBILE -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 px-1 py-1 flex justify-around items-center shadow-lg no-print">
     <button onclick="switchTab('dashboard')" id="mbTab-dashboard" class="flex flex-col items-center py-1 px-1.5 rounded-xl text-brand-600 dark:text-brand-400">
@@ -637,7 +717,7 @@
     </button>
   </nav>
 
-  <!-- SCRIPT APPLICATION DYNAMIQUE -->
+  <!-- SCRIPT APPLICATION EXPERT COMPLET -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCOanyZ4aEoxfC70tJrwbuueyEoSdVul-Y",
@@ -663,6 +743,7 @@
     let activeTab = 'dashboard';
     let salaireNet = 300000;
     let targetPrixTerrain = 2000000;
+    let selectedDate = new Date(); // Date courante du sélecteur
     let epargnesList = [];
     let depensesList = [];
     let seneauList = [];
@@ -670,6 +751,7 @@
     let bourseList = [];
     let checklistState = [false, false, false, false, false];
     let chartInstance = null;
+    let lineChartInstance = null;
 
     const checklistItems = [
       "Vérification de la délibération / Titre Foncier à la Mairie ou aux Domaines",
@@ -686,16 +768,24 @@
       initFirebaseSync();
     });
 
-    function getCurrentMonthKey() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
+    function getSelectedMonthKey() {
+      const yyyy = selectedDate.getFullYear();
+      const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
       return `${yyyy}-${mm}`;
     }
 
-    function getCurrentMonthName() {
-      const today = new Date();
-      return today.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    function getSelectedMonthName() {
+      return selectedDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    }
+
+    function prevMonth() {
+      selectedDate.setMonth(selectedDate.getMonth() - 1);
+      renderAll();
+    }
+
+    function nextMonth() {
+      selectedDate.setMonth(selectedDate.getMonth() + 1);
+      renderAll();
     }
 
     function initFirebaseSync() {
@@ -764,15 +854,18 @@
         if (dtBtn) {
           if (t === tabId) {
             dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition bg-white dark:bg-slate-800 text-brand-600 shadow-sm";
-            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-2 rounded-xl text-brand-600 dark:text-brand-400 font-bold";
+            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-1.5 rounded-xl text-brand-600 dark:text-brand-400 font-bold";
           } else {
             dtBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition text-slate-600 dark:text-slate-300 hover:text-slate-900";
-            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-2 rounded-xl text-slate-400";
+            if (mbBtn) mbBtn.className = "flex flex-col items-center py-1 px-1.5 rounded-xl text-slate-400";
           }
         }
       });
 
-      if (tabId === 'dashboard') renderChart();
+      if (tabId === 'dashboard') {
+        renderChart();
+        renderLineChart();
+      }
     }
 
     function initTheme() {
@@ -782,17 +875,54 @@
     }
 
     function setDefaultDates() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      document.getElementById('epargneMois').value = `${yyyy}-${mm}`;
-      document.getElementById('seneauMois').value = `${yyyy}-${mm}`;
+      const monthKey = getSelectedMonthKey();
+      document.getElementById('epargneMois').value = monthKey;
+      document.getElementById('seneauMois').value = monthKey;
     }
 
     function updateTerrainTarget() {
       targetPrixTerrain = parseInt(document.getElementById('selectPrixTerrain').value);
       saveData();
     }
+
+    // GESTION MODALE SAISIE RAPIDE
+    function openQuickAddModal() {
+      document.getElementById('quickAddModal').classList.remove('hidden');
+    }
+    function closeQuickAddModal() {
+      document.getElementById('quickAddModal').classList.add('hidden');
+    }
+    function toggleQuickFields() {
+      const type = document.getElementById('quickType').value;
+      const catContainer = document.getElementById('quickCategoryContainer');
+      if (type === 'epargne') {
+        catContainer.classList.add('hidden');
+      } else {
+        catContainer.classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('formQuickAdd').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const type = document.getElementById('quickType').value;
+      const motif = document.getElementById('quickMotif').value;
+      const montant = parseInt(document.getElementById('quickMontant').value);
+      const monthKey = getSelectedMonthKey();
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      if (type === 'depense') {
+        const categorie = document.getElementById('quickCategorie').value;
+        depensesList.unshift({ id: Date.now(), date: todayStr, motif, montant, categorie });
+      } else {
+        epargnesList.push({ id: Date.now(), mois: monthKey, montant, destination: "Compte Épargne Projet Terrain" });
+        epargnesList.sort((a, b) => a.mois.localeCompare(b.mois));
+      }
+
+      document.getElementById('quickMotif').value = '';
+      document.getElementById('quickMontant').value = '';
+      closeQuickAddModal();
+      saveData();
+    });
 
     // FORMULAIRES
     document.getElementById('formEpargne').addEventListener('submit', (e) => {
@@ -879,18 +1009,33 @@
     window.deleteBourse = function(id) { bourseList = bourseList.filter(item => item.id !== id); saveData(); };
 
     function renderAll() {
+      document.getElementById('currentMonthLabel').textContent = getSelectedMonthName();
       document.getElementById('displaySalaireNet').textContent = formatFCFA(salaireNet);
       
-      // CHARGES FIXES ET CALCULS DYNAMIQUES DU MOIS EN COURS
-      const currentMonthKey = getCurrentMonthKey();
+      const currentMonthKey = getSelectedMonthKey();
       
-      const chargesFixesMoisEnCours = depensesList
+      // CHARGES FIXES DUS DU MOIS
+      const chargesFixesMois = depensesList
         .filter(item => item.date && item.date.startsWith(currentMonthKey) && item.categorie === 'Charges Fixes')
         .reduce((sum, item) => sum + item.montant, 0);
 
-      document.getElementById('displayChargesFixes').textContent = formatFCFA(chargesFixesMoisEnCours);
-      document.getElementById('labelMoisChargesFixes').textContent = `Mois actuel (${getCurrentMonthName()})`;
+      // TOTAL DÉPENSES MOIS (TOUTES CATÉGORIES)
+      const totalDepensesMois = depensesList
+        .filter(item => item.date && item.date.startsWith(currentMonthKey))
+        .reduce((sum, item) => sum + item.montant, 0);
 
+      // ÉPARGNE VERSÉE SUR LE MOIS
+      const epargneMois = epargnesList
+        .filter(item => item.mois === currentMonthKey)
+        .reduce((sum, item) => sum + item.montant, 0);
+
+      // CALCUL DU RESTE À VIVRE (CASHFLOW)
+      const resteAVivre = salaireNet - (totalDepensesMois + epargneMois);
+
+      document.getElementById('displayChargesFixes').textContent = formatFCFA(chargesFixesMois);
+      document.getElementById('displayResteAVivre').textContent = formatFCFA(resteAVivre);
+
+      renderAlerts(currentMonthKey);
       renderTerrainProgress();
       renderEpargneTable();
       renderDepensesTable();
@@ -899,6 +1044,45 @@
       renderBourseTable();
       renderChecklist();
       renderChart();
+      renderLineChart();
+    }
+
+    function renderAlerts(monthKey) {
+      const container = document.getElementById('alertsContainer');
+      container.innerHTML = '';
+
+      // Alerte SEN'EAU > 15 000 FCFA
+      const seneauMois = seneauList.find(item => item.mois === monthKey);
+      if (seneauMois && seneauMois.montant > 15000) {
+        const overflow = seneauMois.montant - 15000;
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+            <span><strong>Alerte SEN'EAU :</strong> La facture dépasse l'objectif de 15 000 FCFA (+${formatFCFA(overflow)}).</span>
+          </div>
+          <button onclick="switchTab('seneau')" class="underline font-bold">Voir SEN'EAU</button>
+        `;
+        container.appendChild(div);
+      }
+
+      // Rappel Épargne Terrain du Mois
+      const epargneDuMois = epargnesList.filter(item => item.mois === monthKey);
+      if (epargneDuMois.length === 0) {
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 text-xs flex items-center justify-between";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i data-lucide="bell" class="w-4 h-4 text-blue-600"></i>
+            <span><strong>Rappel Épargne :</strong> Aucun virement d'épargne n'a encore été enregistré pour ${getSelectedMonthName()}.</span>
+          </div>
+          <button onclick="switchTab('epargne')" class="underline font-bold">Ajouter un versement</button>
+        `;
+        container.appendChild(div);
+      }
+
+      lucide.createIcons();
     }
 
     function formatFCFA(val) { return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA'; }
@@ -930,6 +1114,7 @@
       document.getElementById('dashCumulEpargne').textContent = formatFCFA(totalCumule);
       document.getElementById('dashAvancementTerrain').textContent = `${pourcent}% de l'objectif terrain`;
       document.getElementById('dashFondsUrgence').textContent = formatFCFA(totalUrgences);
+      document.getElementById('lineChartCibleLabel').textContent = `Cible : ${formatFCFA(targetPrixTerrain)}`;
     }
 
     function renderEpargneTable() {
@@ -1135,13 +1320,14 @@
       document.getElementById('checklistProgress').textContent = `${doneCount}/5 vérifié(s)`;
     }
 
+    // GRAPHIQUE CAMEMBERT (RÉPARTITION DU MOIS)
     function renderChart() {
       const canvas = document.getElementById('budgetChart');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
-      const currentMonthKey = getCurrentMonthKey();
+      const currentMonthKey = getSelectedMonthKey();
 
       const chargesFixes = depensesList
         .filter(item => item.date && item.date.startsWith(currentMonthKey) && item.categorie === 'Charges Fixes')
@@ -1171,8 +1357,67 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           cutout: '70%'
+        }
+      });
+    }
+
+    // GRAPHIQUE EN COURBE (PROGRESSION CUMULÉE TERRAIN)
+    function renderLineChart() {
+      const canvas = document.getElementById('progressionLineChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (lineChartInstance) lineChartInstance.destroy();
+
+      // Construction des données par mois
+      const monthsMap = {};
+      let runningTotal = 0;
+
+      // Trier les épargnes chronologiquement
+      const sortedEpargnes = [...epargnesList].sort((a, b) => a.mois.localeCompare(b.mois));
+
+      sortedEpargnes.forEach(item => {
+        if (item.destination !== "Fonds d'Urgence / Sécurité") {
+          runningTotal += item.montant;
+          monthsMap[item.mois] = runningTotal;
+        }
+      });
+
+      const labels = Object.keys(monthsMap);
+      const dataValues = Object.values(monthsMap);
+
+      lineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length > 0 ? labels : ['Mois 1'],
+          datasets: [{
+            label: 'Cumul Épargne (FCFA)',
+            data: dataValues.length > 0 ? dataValues : [0],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.3,
+            borderWidth: 3,
+            pointBackgroundColor: '#047857'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(156, 163, 175, 0.1)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
         }
       });
     }
